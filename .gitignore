@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+logs/*
+!logs/.gitkeep
+runs/*
+!runs/.gitkeep
