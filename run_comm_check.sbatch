@@ -1,7 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=comm-check
 #SBATCH --partition=faculty
-#SBATCH --qos=qirong_qos
 #SBATCH --nodes=2
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:mi210:8
@@ -32,10 +31,9 @@ RUN_DIR="${RUN_ROOT}/${SLURM_JOB_ID}_${RUN_LABEL}"
 NODES_FILE="${RUN_DIR}/allocated_nodes.txt"
 STEP_SCRIPT="${RUN_DIR}/comm_check_step.sh"
 
-CONDA_ENV="${CONDA_ENV:-}"
-CONDA_INIT_SCRIPT="${CONDA_INIT_SCRIPT:-}"
-PYTHON_BIN="${PYTHON_BIN:-python}"
-TORCHRUN_BIN="${TORCHRUN_BIN:-torchrun}"
+VENV_PATH="${VENV_PATH:-${SCRIPT_DIR}/.venv}"
+PYTHON_BIN="${PYTHON_BIN:-${VENV_PATH}/bin/python}"
+TORCHRUN_BIN="${TORCHRUN_BIN:-${VENV_PATH}/bin/torchrun}"
 ROCM_PATH="${ROCM_PATH:-/opt/rocm-7.0.0}"
 
 NCCL_P2P_DISABLE="${NCCL_P2P_DISABLE:-0}"
@@ -47,27 +45,22 @@ TORCH_NCCL_ASYNC_ERROR_HANDLING="${TORCH_NCCL_ASYNC_ERROR_HANDLING:-1}"
 
 mkdir -p "${RUN_DIR}" "${LOG_DIR}"
 
-activate_python_env() {
-  source ~/.bashrc || true
-  if [[ -z "${CONDA_ENV}" ]]; then
-    return
-  fi
-  if [[ -n "${CONDA_INIT_SCRIPT}" ]]; then
-    if [[ ! -f "${CONDA_INIT_SCRIPT}" ]]; then
-      echo "ERROR: CONDA_INIT_SCRIPT does not exist: ${CONDA_INIT_SCRIPT}" >&2
-      exit 1
-    fi
-    source "${CONDA_INIT_SCRIPT}"
-  elif command -v conda >/dev/null 2>&1; then
-    eval "$(conda shell.bash hook)"
-  else
-    echo "ERROR: CONDA_ENV=${CONDA_ENV} was set, but conda is not on PATH and CONDA_INIT_SCRIPT is unset." >&2
+validate_python_env() {
+  if [[ ! -x "${PYTHON_BIN}" ]]; then
+    echo "ERROR: Python executable not found: ${PYTHON_BIN}" >&2
+    echo "Create the default environment with: scripts/setup_rocm_venv.sh" >&2
+    echo "Or pass VENV_PATH, PYTHON_BIN, and TORCHRUN_BIN explicitly." >&2
     exit 1
   fi
-  conda activate "${CONDA_ENV}"
+  if [[ ! -x "${TORCHRUN_BIN}" ]]; then
+    echo "ERROR: torchrun executable not found: ${TORCHRUN_BIN}" >&2
+    echo "Create the default environment with: scripts/setup_rocm_venv.sh" >&2
+    echo "Or pass VENV_PATH, PYTHON_BIN, and TORCHRUN_BIN explicitly." >&2
+    exit 1
+  fi
 }
 
-activate_python_env
+validate_python_env
 cd "${REPO_DIR}"
 
 echo "Job ID: ${SLURM_JOB_ID}"
@@ -79,8 +72,9 @@ echo "Expected nodes: ${EXPECTED_NUM_NODES}"
 echo "Slurm nodelist: ${SLURM_JOB_NODELIST}"
 echo "GPUs per node: ${GPUS_PER_NODE}"
 echo "Master port: ${MASTER_PORT}"
+echo "Venv path: ${VENV_PATH}"
 echo "Python: $(${PYTHON_BIN} --version 2>&1)"
-echo "Torchrun: $(command -v "${TORCHRUN_BIN}" || true)"
+echo "Torchrun: ${TORCHRUN_BIN}"
 
 scontrol show hostnames "${SLURM_JOB_NODELIST}" > "${NODES_FILE}"
 mapfile -t ALLOCATED_NODES < "${NODES_FILE}"
@@ -100,8 +94,7 @@ echo "Master node: ${MASTER_ADDR}:${MASTER_PORT}"
 export REPO_DIR
 export SCRIPT_DIR
 export RUN_DIR
-export CONDA_INIT_SCRIPT
-export CONDA_ENV
+export VENV_PATH
 export PYTHON_BIN
 export TORCHRUN_BIN
 export ROCM_PATH
@@ -128,18 +121,6 @@ cat > "${STEP_SCRIPT}" <<'EOF'
 set -euo pipefail
 
 cd "${REPO_DIR}"
-source ~/.bashrc || true
-if [[ -n "${CONDA_ENV}" ]]; then
-  if [[ -n "${CONDA_INIT_SCRIPT}" ]]; then
-    source "${CONDA_INIT_SCRIPT}"
-  elif command -v conda >/dev/null 2>&1; then
-    eval "$(conda shell.bash hook)"
-  else
-    echo "ERROR: CONDA_ENV=${CONDA_ENV} was set, but conda is unavailable." >&2
-    exit 1
-  fi
-  conda activate "${CONDA_ENV}"
-fi
 
 if [[ -d "${ROCM_PATH}/bin" ]]; then
   export PATH="${ROCM_PATH}/bin:${PATH}"
