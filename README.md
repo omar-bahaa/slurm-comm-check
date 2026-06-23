@@ -20,7 +20,7 @@ for distributed training.
 ## Reproducible Setup Branch
 
 The `main` branch is kept as the default branch and currently preserves the
-original CAMDPI/user-specific Slurm and Python setup used during the investigation.
+original CAMD/user-specific Slurm and Python setup used during the investigation.
 
 For a reproducible setup that creates a repo-local Python virtual environment and
 installs PyTorch for ROCm 7.0 with:
@@ -53,7 +53,7 @@ scripts/setup_rocm_venv.sh
 - `torchrun` on `PATH`
 - ROCm clusters: `rocm-smi` on `PATH`
 
-The default `run_comm_check.sbatch` settings match the CAMDPI MI210 Slurm setup:
+The default `run_comm_check.sbatch` settings match the CAMD MI210 Slurm setup:
 
 - partition: `faculty`
 - QoS: `qirong_qos`
@@ -187,9 +187,9 @@ Common failure signals:
 The benchmark is a health check, not an application throughput model. Use it to
 find nodes, node pairs, or scale points that break basic GPU communication.
 
-## Historical CAMDPI MI210 Notes
+## Historical CAMD MI210 Notes
 
-The `docs/camdpi-mi210/` directory contains the node-classification notes from
+The `docs/camd-mi210/` directory contains the node-classification notes from
 the investigation that motivated this tool. Those files are examples of how to
 record pairwise and scale-dependent findings; they are not required to run the
 benchmark.
