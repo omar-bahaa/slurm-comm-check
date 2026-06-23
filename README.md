@@ -17,6 +17,34 @@ and measures the communication patterns that commonly expose cluster issues:
 It has no Python package dependency beyond the PyTorch environment you already use
 for distributed training.
 
+## Reproducible Setup Branch
+
+The `main` branch is kept as the default branch and currently preserves the
+original CAMDPI/user-specific Slurm and Python setup used during the investigation.
+
+For a reproducible setup that creates a repo-local Python virtual environment and
+installs PyTorch for ROCm 7.0 with:
+
+```bash
+pip install --index-url https://download.pytorch.org/whl/rocm7.0 torch torchvision torchaudio
+```
+
+use the `venv-rocm7-setup` branch:
+
+```bash
+git clone --branch venv-rocm7-setup https://github.com/omar-bahaa/slurm-comm-check.git
+cd slurm-comm-check
+scripts/setup_rocm_venv.sh
+```
+
+If you already cloned this repository:
+
+```bash
+git fetch origin
+git switch venv-rocm7-setup
+scripts/setup_rocm_venv.sh
+```
+
 ## Requirements
 
 - Slurm
