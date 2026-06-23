@@ -25,7 +25,7 @@ It does not require conda and does not assume any user-specific Python path.
 - `rocm-smi` available through the ROCm installation
 - GPU nodes allocated exclusively or otherwise free enough for full-node testing
 
-The checked-in `run_comm_check.sbatch` has practical MI210-style defaults:
+The checked-in `run_comm_check.sbatch` has practical CAMD MI210-style defaults:
 
 - partition: `faculty`
 - GPUs per node: `gpu:mi210:8`
@@ -250,9 +250,9 @@ Common failure signals:
 The benchmark is a health check, not an application throughput model. Use it to
 find nodes, node pairs, or scale points that break basic GPU communication.
 
-## Historical CAMDPI MI210 Notes
+## Historical CAMD MI210 Notes
 
-The `docs/camdpi-mi210/` directory contains the node-classification notes from
+The `docs/camd-mi210/` directory contains the node-classification notes from
 the investigation that motivated this tool. Those files are examples of how to
 record pairwise and scale-dependent findings; they are not required to run the
 benchmark.

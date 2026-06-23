@@ -1,4 +1,4 @@
-# CAMDPI MI210 Communication Findings
+# CAMD MI210 Communication Findings
 
 These notes record the communication-health investigation that motivated the
 standalone benchmark.
