@@ -26,7 +26,6 @@ communication baseline.
 | `Too slow / pair not isolated` | Communication completed, but latency is far above the healthy baseline. The evidence currently implicates a pair or group, not one specific endpoint. | Do not classify as communication-healthy yet. Retest each node against a known-good partner before deciding whether only one node is bad. |
 | `Healthy` | The node completed one or more communication benchmarks with normal collective and p2p latency, including healthy scale checks where available. | Good node for multinode communication groups. |
 | `Healthy / usable` | The node completed a 2-node communication benchmark with acceptable latency, but has less scale evidence than the strongest healthy baseline nodes. | Usable for communication groups, especially when more scale-tested healthy nodes are insufficient. Prefer more scale-tested healthy nodes first. |
-| `Healthy after cross-check` | The node appeared in a failed pair, but a later cross-check with a known-good partner passed and the failure was isolated to the other node. | Treat as communication-usable. Keep the failed-pair context in mind, but do not exclude based on the earlier failed partner. |
 | `Healthy communication; SSH/PAM separate` | NCCL/RCCL communication passed, but this node had a separate non-communication issue in SSH/PAM/Slurm adoption behavior. | Usable for communication if launched through a Slurm-safe path. Keep orchestration issues separate from comm-health classification. |
 
 ## Category Summary
@@ -35,9 +34,8 @@ communication baseline.
 |---|---:|---|
 | Failed nodes | 5 | `auh7-1b-gpu-[206,275-276,282,319]` |
 | Very slow nodes | 12 | `auh7-1b-gpu-[196-197,225-226,228,271-274,284-285,317]` |
-| Healthy nodes | 8 | `auh7-1b-gpu-[227,267-270,286,296-297]` |
+| Healthy nodes | 10 | `auh7-1b-gpu-[200,227,267-270,286,296-297,320]` |
 | Healthy / usable nodes | 4 | `auh7-1b-gpu-[210,224,240,252]` |
-| Healthy after cross-check | 2 | `auh7-1b-gpu-[200,320]` |
 | Healthy communication; SSH/PAM separate | 1 | `auh7-1b-gpu-287` |
 | All nodes with run evidence | 32 | `auh7-1b-gpu-[196-197,200,206,210,224-228,240,252,267-276,282,284-287,296-297,317,319-320]` |
 
@@ -47,7 +45,7 @@ communication baseline.
 |---|---|---|---|
 | `auh7-1b-gpu-196` | `197`; 16-node set `76597` | Too slow / pair not isolated | With `197`: all-reduce 1 MiB `3.37 ms`, 64 MiB `54.78 ms`, ring p2p 64 MiB `79.00 ms`. In 16-node set: all-reduce 1 MiB `40.01 ms`. |
 | `auh7-1b-gpu-197` | `196`; 16-node set `76597` | Too slow / pair not isolated | With `196`: all-reduce 1 MiB `3.37 ms`, 64 MiB `54.78 ms`, ring p2p 64 MiB `79.00 ms`. In 16-node set: all-reduce 1 MiB `40.01 ms`. |
-| `auh7-1b-gpu-200` | `206`, `267` | Healthy after cross-check | Failed with `206`, but `206` later reproduced the failure with `268`. With known-good `267`: all-reduce 1 MiB `0.683 ms`, 64 MiB `25.41 ms`, ring p2p 64 MiB `32.66 ms`. |
+| `auh7-1b-gpu-200` | `206`, `267` | Healthy | Failed with `206`, but `206` later reproduced the failure with `268`. With known-good `267`: all-reduce 1 MiB `0.683 ms`, 64 MiB `25.41 ms`, ring p2p 64 MiB `32.66 ms`. |
 | `auh7-1b-gpu-206` | `200`, `268` | Comm failed | ROCm health passed, then ranks on `206` failed in both jobs with `torch.AcceleratorError: HIP error: invalid argument`; peer ranks later saw TCPStore/NCCL setup shutdown. |
 | `auh7-1b-gpu-210` | `224` | Healthy / usable | With `224`: all-reduce 1 MiB `0.62 ms`, 64 MiB `13.42 ms`, ring p2p 64 MiB `30.51 ms`. |
 | `auh7-1b-gpu-224` | `210` | Healthy / usable | With `210`: all-reduce 1 MiB `0.62 ms`, 64 MiB `13.42 ms`, ring p2p 64 MiB `30.51 ms`. |
@@ -76,7 +74,7 @@ communication baseline.
 | `auh7-1b-gpu-297` | `227`; healthy 8-node set `76346`; degraded 16-node set `76597` | Healthy | With `227`: all-reduce 1 MiB `0.653 ms`, 64 MiB `23.65 ms`. Healthy 8-node set `76346`: all-reduce 1 MiB `1.05 ms`, 64 MiB `35.32 ms`. The 16-node set was degraded and does not clear this node as 16-node healthy. |
 | `auh7-1b-gpu-317` | `274`; 16-node set `76597` | Too slow / pair not isolated | With `274`: all-reduce 1 MiB `3.40 ms`, 64 MiB `58.89 ms`, ring p2p 64 MiB `78.73 ms`. In 16-node set: all-reduce 1 MiB `40.01 ms`. |
 | `auh7-1b-gpu-319` | `320`, `269` | Comm failed | RCCL `NET/IB` fatal completion on `rocep97s0f0`, `status=12`, `vendor err 10`, `local work queue catastrophic error`; reproduced with known-good `269`. |
-| `auh7-1b-gpu-320` | `319`, `270` | Healthy after cross-check | Failed only when paired with bad `319`. Passed with `270`: all-reduce 1 MiB `0.672 ms`, 64 MiB `25.66 ms`, ring p2p 64 MiB `30.48 ms`. |
+| `auh7-1b-gpu-320` | `319`, `270` | Healthy | Failed only when paired with bad `319`. Passed with `270`: all-reduce 1 MiB `0.672 ms`, 64 MiB `25.66 ms`, ring p2p 64 MiB `30.48 ms`. |
 
 ## Current Communication Guidance
 
