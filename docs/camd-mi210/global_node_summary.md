@@ -29,6 +29,18 @@ communication baseline.
 | `Healthy after cross-check` | The node appeared in a failed pair, but a later cross-check with a known-good partner passed and the failure was isolated to the other node. | Treat as communication-usable. Keep the failed-pair context in mind, but do not exclude based on the earlier failed partner. |
 | `Healthy communication; SSH/PAM separate` | NCCL/RCCL communication passed, but this node had a separate non-communication issue in SSH/PAM/Slurm adoption behavior. | Usable for communication if launched through a Slurm-safe path. Keep orchestration issues separate from comm-health classification. |
 
+## Category Summary
+
+| Category | Total nodes tried | Nodes tried |
+|---|---:|---|
+| Failed nodes | 5 | `auh7-1b-gpu-[206,275-276,282,319]` |
+| Very slow nodes | 12 | `auh7-1b-gpu-[196-197,225-226,228,271-274,284-285,317]` |
+| Healthy nodes | 8 | `auh7-1b-gpu-[227,267-270,286,296-297]` |
+| Healthy / usable nodes | 4 | `auh7-1b-gpu-[210,224,240,252]` |
+| Healthy after cross-check | 2 | `auh7-1b-gpu-[200,320]` |
+| Healthy communication; SSH/PAM separate | 1 | `auh7-1b-gpu-287` |
+| All nodes with run evidence | 32 | `auh7-1b-gpu-[196-197,200,206,210,224-228,240,252,267-276,282,284-287,296-297,317,319-320]` |
+
 ## Node Table
 
 | Node | Tried With | Category | Evidence |
